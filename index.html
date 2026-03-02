@@ -310,11 +310,11 @@
 
             let ending = document.getElementById("ending")
 
+            // 计算是否达成好结局
             let good = required.every(p => chosen.includes(p))
 
             let result = document.createElement("div")
 
-            // ① 先判断正常结局
             if (good) {
 
                 result.className = "good"
@@ -330,20 +330,27 @@
             ending.appendChild(result)
 
 
-            // ② 再检查过敏死亡
+            // 再计算过敏死亡（不会影响上面的显示）
             let deaths = chosen.filter(person => allergy.includes(person))
 
             if (deaths.length > 0) {
 
-                let extra = document.createElement("div")
-                extra.className = "extra"
+                let warningTitle = document.createElement("div")
+                warningTitle.className = "bad"
+                warningTitle.style.marginTop = "20px"
 
-                extra.innerHTML =
-                    "<br>WARNING: Vaccine allergic reaction detected<br>" +
-                    deaths.length + " individual(s) deceased<br>" +
-                    "Fatalities: " + deaths.join(", ")
+                warningTitle.innerHTML =
+                    "<br>VACCINE REACTION DETECTED<br>" +
+                    deaths.length + " INDIVIDUAL(S) DECEASED"
 
-                ending.appendChild(extra)
+                ending.appendChild(warningTitle)
+
+
+                let nameDiv = document.createElement("div")
+                nameDiv.className = "extra"
+                nameDiv.innerHTML = "Fatalities: " + deaths.join(", ")
+
+                ending.appendChild(nameDiv)
 
             }
 
@@ -354,4 +361,5 @@
 </body>
 
 </html>
+
 
