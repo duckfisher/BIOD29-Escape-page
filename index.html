@@ -310,47 +310,41 @@
 
             let ending = document.getElementById("ending")
 
-            // 先计算过敏死亡名单
-            let deaths = chosen.filter(person => allergy.includes(person))
-
-            // 计算好结局条件
             let good = required.every(p => chosen.includes(p))
 
             let result = document.createElement("div")
 
-            // 如果有人因过敏死亡
-            if (deaths.length > 0) {
+            // ① 先判断正常结局
+            if (good) {
 
-                result.className = "bad"
-                result.innerHTML =
-                    "<br>VACCINE REACTION DETECTED<br>" +
-                    deaths.length + " INDIVIDUAL(S) DECEASED"
-
-                ending.appendChild(result)
-
-                let nameDiv = document.createElement("div")
-                nameDiv.className = "extra"
-                nameDiv.innerHTML = "Fatalities: " + deaths.join(", ")
-
-                ending.appendChild(nameDiv)
+                result.className = "good"
+                result.innerHTML = "<br>HERD IMMUNITY ACHIEVED"
 
             } else {
 
-                // 没有过敏死亡才判断正常结局
+                result.className = "bad"
+                result.innerHTML = "<br>PANDEMIC UNCONTROLLED"
 
-                if (good) {
+            }
 
-                    result.className = "good"
-                    result.innerHTML = "<br>HERD IMMUNITY ACHIEVED"
+            ending.appendChild(result)
 
-                } else {
 
-                    result.className = "bad"
-                    result.innerHTML = "<br>PANDEMIC UNCONTROLLED"
+            // ② 再检查过敏死亡
+            let deaths = chosen.filter(person => allergy.includes(person))
 
-                }
+            if (deaths.length > 0) {
 
-                ending.appendChild(result)
+                let extra = document.createElement("div")
+                extra.className = "extra"
+
+                extra.innerHTML =
+                    "<br>WARNING: Vaccine allergic reaction detected<br>" +
+                    deaths.length + " individual(s) deceased<br>" +
+                    "Fatalities: " + deaths.join(", ")
+
+                ending.appendChild(extra)
+
             }
 
         }
@@ -360,3 +354,4 @@
 </body>
 
 </html>
+
