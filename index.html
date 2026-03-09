@@ -317,7 +317,8 @@
 
     <section class="screen" id="storyPage">
         <div class="terminal">
-
+            <h1>The Village Outbreak</h1>
+            <div class="subtitle">An Epidemiology Puzzle</div>
             <!-- PART 1 -->
             <div class="panel">
                 <span class="label">BACKGROUND</span>
@@ -399,7 +400,7 @@
 
     <section class="screen" id="puzzle1Page">
         <div class="terminal">
-            <h2>PUZZLE 1 TERMINAL - Part 1</h2>
+            <h2>PUZZLE 1 - PART 1</h2>
             <div class="subtitle">Trace the Source</div>
             <div class="panel">
                 <span class="label">PUZZLE 1 BRIEF</span>
@@ -419,7 +420,7 @@
                     gathered</span> so far, where
                 are the possible locations that Eliza Brown could've been infected from? List the locations in order.
             </div>
-            <input type="text" id="password1a" placeholder="ENTER PASSWORD FOR PUZZLE 1 Part 2" />
+            <input type="text" id="password1a" placeholder="ENTER PASSWORD" />
             <button onclick="checkPuzzle1Part1()">UNLOCK PUZZLE 1 Part 2</button>
             <div class="error" id="error1a"></div>
             <button class="secondary" onclick="showPage('storyPage')">BACK</button>
@@ -428,7 +429,7 @@
 
     <section class="screen" id="puzzle1Part2Page">
         <div class="terminal">
-            <h2>PUZZLE 1 TERMINAL - Part 2</h2>
+            <h2>PUZZLE 1 - PART 2</h2>
             <div class="subtitle">Host Range Matching</div>
             <div class="panel">
                 <span class="label">Labratory Report</span>
@@ -458,7 +459,7 @@
 
     <section class="screen" id="puzzle2Part1Page">
         <div class="terminal">
-            <h2>PUZZLE 2 TERMINAL - Part1</h2>
+            <h2>PUZZLE 2 - PART 1</h2>
             <div class="subtitle">Mutation & Viral Adaptation</div>
             <div class="panel">
                 <span class="label">Background Story</span>
@@ -499,8 +500,8 @@
                 amino acid from sequence 1, then from sequence 2.
                 <img src="match.png" alt="Match Sheet" class="story-image">
             </div>
-            <input type="text" id="password2a" placeholder="ENTER Part1a PASSWORD" />
-            <input type="text" id="password2b" placeholder="ENTER Part1b PASSWORD" />
+            <input type="text" id="password2a" placeholder="ENTER FIRST PASSWORD" />
+            <input type="text" id="password2b" placeholder="ENTER SECOND PASSWORD" />
             <button onclick="checkPuzzle2Part1()">UNLOCK PUZZLE 2 Part 2</button>
             <div class="error" id="error2"></div>
             <button class="secondary" onclick="showPage('puzzle1Part2Page')">BACK</button>
@@ -509,7 +510,7 @@
 
     <section class="screen" id="puzzle2Part2Page">
         <div class="terminal">
-            <h2>PUZZLE 2 TERMINAL - Part2</h2>
+            <h2>PUZZLE 2 - PART 2</h2>
             <div class="subtitle">Tracing Viral Evolution</div>
             <div class="panel">
                 <span class="label">Cross-Species Spillover</span>
@@ -536,7 +537,7 @@
 
     <section class="screen" id="puzzle3Page">
         <div class="terminal">
-            <h1>PUZZLE 3 TERMINAL</h1>
+            <h1>PUZZLE 3</h1>
             <div class="panel">
                 <span class="label">Containing the Outbreak</span>
                 In the days following Eliza Brown's death, several villagers begin showing flu-like symptoms. The clinic
@@ -743,7 +744,7 @@
                 let v = document.getElementById("slot" + i).value;
 
                 if (v === "") {
-                    errorBox.textContent = "ERROR: You must select 8 villagers before continuing.";
+                    errorBox.textContent = "ERROR: You must select 8 people before continuing.";
                     return;
                 }
 
