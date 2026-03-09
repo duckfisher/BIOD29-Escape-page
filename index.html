@@ -1,63 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>VACCINE DISTRIBUTION TERMINAL</title>
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outbreak Puzzle Terminal</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background: radial-gradient(circle, #0b140b, #020402);
             color: #7CFF00;
             font-family: monospace;
             margin: 0;
-            padding: 20px;
+            min-height: 100vh;
             text-align: center;
+            overflow-x: hidden;
         }
 
-        /* 扫描线 */
         .scanline {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             pointer-events: none;
             background: repeating-linear-gradient(to bottom,
                     rgba(0, 255, 0, 0.03),
                     rgba(0, 255, 0, 0.03) 2px,
                     transparent 2px,
                     transparent 4px);
+            z-index: 10;
         }
 
-        /* 选择区域动画 */
-        .fadeOut {
-            animation: fadeOut 0.8s forwards;
+        .screen {
+            min-height: 100vh;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            100% {
-                opacity: 0;
-                transform: scale(0.95);
-            }
+        .screen.active {
+            display: flex;
         }
 
-        h1 {
+        .terminal {
+            width: 100%;
+            max-width: 460px;
+            margin: auto;
+            background: rgba(0, 0, 0, 0.68);
+            border: 1px solid rgba(124, 255, 0, 0.35);
+            border-radius: 16px;
+            padding: 24px 18px;
+            box-shadow:
+                0 0 18px rgba(124, 255, 0, 0.18),
+                inset 0 0 18px rgba(124, 255, 0, 0.08);
+        }
+
+        h1,
+        h2 {
+            margin: 0 0 12px;
             letter-spacing: 2px;
             text-shadow: 0 0 10px #7CFF00;
+            line-height: 1.3;
         }
 
         .subtitle {
             color: #9bd49b;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .panel {
+            background: rgba(0, 40, 0, 0.26);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 12px 0;
+            border: 1px solid rgba(124, 255, 0, 0.24);
+            box-shadow:
+                0 0 10px rgba(124, 255, 0, 0.12),
+                inset 0 0 10px rgba(124, 255, 0, 0.05);
+            text-align: left;
+            line-height: 1.7;
+            color: #d7ffd0;
+            font-size: 14px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .label {
+            color: #7CFF00;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            margin-top: 16px;
+            background: linear-gradient(90deg, #56ff00, #aaff00);
+            border: none;
+            border-radius: 10px;
+            color: black;
+            font-weight: bold;
+            font-family: monospace;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(124, 255, 0, 0.35);
+            cursor: pointer;
+        }
+
+        button.secondary {
+            background: transparent;
+            color: #7CFF00;
+            border: 1px solid rgba(124, 255, 0, 0.45);
+            box-shadow: inset 0 0 10px rgba(124, 255, 0, 0.08);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(124, 255, 0, 0.45);
+            background: black;
+            color: #7CFF00;
+            font-size: 16px;
+            font-family: monospace;
+            text-align: center;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: #6cab6c;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 12px;
+            min-height: 20px;
+            text-shadow: 0 0 8px rgba(255, 0, 0, 0.35);
+        }
+
+        .success {
+            color: #7CFF00;
+            font-size: 14px;
+            margin-top: 12px;
+            min-height: 20px;
+            text-shadow: 0 0 8px rgba(124, 255, 0, 0.35);
+        }
+
+        .mini-note {
+            font-size: 12px;
+            color: #9bd49b;
+            margin-top: 10px;
+            line-height: 1.5;
         }
 
         .slot {
@@ -66,7 +169,8 @@
             padding: 10px;
             margin: 10px 0;
             border: 1px solid rgba(124, 255, 0, 0.3);
-            box-shadow: 0 0 10px rgba(124, 255, 0, 0.2),
+            box-shadow:
+                0 0 10px rgba(124, 255, 0, 0.2),
                 inset 0 0 10px rgba(124, 255, 0, 0.1);
         }
 
@@ -78,51 +182,43 @@
             color: #7CFF00;
             border-radius: 8px;
             border: 1px solid rgba(124, 255, 0, 0.5);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            margin-top: 20px;
-            background: linear-gradient(90deg, #56ff00, #aaff00);
-            border: none;
-            border-radius: 10px;
-            color: black;
-            font-weight: bold;
-            box-shadow: 0 0 20px rgba(124, 255, 0, 0.5);
+            font-family: monospace;
         }
 
         #ending {
-            margin-top: 40px;
-            padding: 20px;
+            margin-top: 22px;
+            padding: 18px;
             border-radius: 12px;
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(124, 255, 0, 0.5);
-            box-shadow: 0 0 20px rgba(124, 255, 0, 0.3);
+            box-shadow: 0 0 20px rgba(124, 255, 0, 0.25);
             display: none;
             min-height: 120px;
+            text-align: left;
         }
 
-        .good {
-            color: #7CFF00;
-            font-size: 24px;
-            text-shadow: 0 0 10px #7CFF00;
-        }
-
-        .bad {
+        .label-bad {
             color: #ff4d4d;
-            font-size: 24px;
-            text-shadow: 0 0 10px red;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
         }
 
         .extra {
             color: #00ffff;
             margin-top: 10px;
+            line-height: 1.6;
+            text-align: center;
         }
 
         .flash {
             animation: flash 0.2s 4;
+        }
+
+        .fadeOut {
+            animation: fadeOut 0.8s forwards;
         }
 
         @keyframes flash {
@@ -138,228 +234,612 @@
                 background: black;
             }
         }
-    </style>
 
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+            text-shadow: 0 0 6px #00ffff;
+        }
+
+        .story-image {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            margin: 16px 0;
+            border-radius: 10px;
+        }
+
+        .sequence-block {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(124, 255, 0, 0.4);
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: monospace;
+            line-height: 1.8;
+        }
+
+        .sequence {
+            display: block;
+            color: #00ffff;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px #00ffff;
+        }
+
+        .panel ol {
+            padding-left: 18px;
+        }
+
+        .panel ul {
+            padding-left: 16px;
+        }
+
+        .panel li {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        #resultTerminal {
+            min-height: 180px;
+            text-align: left;
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="scanline"></div>
 
-    <h1>VACCINE DISTRIBUTION TERMINAL</h1>
+    <section class="screen active" id="disclaimerPage">
+        <div class="terminal">
+            <h1>DISCLAIMER</h1>
+            <div class="panel">
+                This is a fictional, game‑style scenario for entertainment and education. It is not medical advice. For
+                real outbreaks or health concerns, consult qualified public‑health professionals.
 
-    <div class="subtitle">
-        Select 8 individuals to vaccinate
-    </div>
+            </div>
+            <button onclick="showPage('storyPage')">I UNDERSTAND</button>
+        </div>
+    </section>
 
-    <!-- 可隐藏区域 -->
-    <div id="selectionArea">
+    <section class="screen" id="storyPage">
+        <div class="terminal">
 
-        <div id="slots"></div>
+            <!-- PART 1 -->
+            <div class="panel">
+                <span class="label">BACKGROUND</span>
 
-        <button onclick="startSimulation()" id="confirmBtn">
-            CONFIRM VACCINATION
-        </button>
+                You are an epidemiologist on summer leave who returned to your small hometown in May. On <span
+                    class="highlight">July 21st, 2026</span>
+                a local resident named Eliza Brown died suddenly from an unknown infection. The village is isolated and
+                anxious, and Mr. Brown, Eliza's sister, is distraught. The local clinic's lab is small with out-dated
+                technology, but managed to conduct an autopsy and found some kind of virus in tissue samples. Because of
+                your hometown being small, there isn't much available information about recent viruses or disease
+                pathology. Since you have knowledge on health and disease outbreaks as a public health processional, you
+                volunteer to investigate, trace the source, and stop the infection before it spreads.
 
-    </div>
+                <br><br>
 
-    <!-- 结局 -->
-    <div id="ending"></div>
+                After receiving approval to investigate with the town hall, the <span class="highlight">clinic's lab
+                    hands you the autopsy
+                    report</span>. You then ask around the town to see if they have interacted with Eliza prior to her
+                death to
+                gain additional information.
+            </div>
+
+
+            <!-- PART 2 -->
+            <div class="panel">
+                <span class="label">COLLECTED INFORMATION</span>
+
+                <div class="panel">
+                    <span class="label">MR.BROWN</span>
+                    <span class="highlight">Mr.Brown</span> noticed her sister coughing for around <span
+                        class="highlight">2 weeks</span> and <span class="highlight">some difficulty sleeping</span>. He
+                    remembered
+                    trying to help her with a high fever that lasted 2 days, but then Eliza seemed completely fine a few
+                    days before her death.
+                </div>
+
+                <div class="panel">
+                    <span class="label">MRS.SMITH</span>
+                    <span class="highlight">Mrs.Smith</span> noted that Eliza didn't have her stew for several days
+                    during the week before her death.
+                    When she asked Eliza why she wasn't having the stew, she replied “I've been having <span
+                        class="highlight">problems with my
+                        stomach</span> recently, I can't keep anything down and I <span class="highlight">haven't been
+                        that hungry</span>!”
+                </div>
+
+                <div class="panel">
+                    <span class="label">BROWN JR.</span>
+                    Brown Jr. mentioned that Eliza didn't play soccer with him as “she was <span class="highlight">too tired</span>”
+                </div>
+
+                <div class="panel">
+                    <span class="label">MARKET NOTE</span>
+                    Eliza often visited the market stalls to buy produce and meats for cooking. She was close friends
+                    with the sellers and would bring some of her cooking for them as a token of appreciation.
+                </div>
+
+            </div>
+
+
+            <!-- PART 3 -->
+            <div class="panel">
+                <span class="label">YOUR MISSION</span>
+
+                <p>Use the three puzzles to:</p>
+
+                <ol class="mission-list">
+                    <li>Identify the original source</li>
+                    <li>Determine how the virus crossed species and killed the victim</li>
+                    <li>Stop the outbreak by choosing who needs to be vaccinated to protect the village</li>
+                </ol>
+
+            </div>
+
+            <button onclick="showPage('puzzle1Page')">START PUZZLES</button>
+
+        </div>
+    </section>
+
+    <section class="screen" id="puzzle1Page">
+        <div class="terminal">
+            <h2>PUZZLE 1 TERMINAL - Part 1</h2>
+            <div class="subtitle">Trace the Source</div>
+            <div class="panel">
+                <span class="label">PUZZLE 1 BRIEF</span>
+                Based on the information you gathered, you went to investigate popular sites in the town among the
+                townsfolk: the market stalls from the farmers. You wanted to investigate whether the animals were
+                affected by this mysterious virus, so you sent some samples from various sites in the town to the
+                nearest veterinary lab to get it tested. Since the local lab can only do basic screening for humans, you
+                have to wait for the veterinary lab to send the results back to you.
+                <br><br>
+                While you wait for the results, you went to the market and asked if there have been any problems
+                recently with their products. <span class="highlight">You wrote some additional information in your
+                    notebook. </span>
+            </div>
+            <div class="panel">
+                <span class="label">Part 1 Instructions</span>
+                The town map has been provided to you. Based on <span class="highlight">all the information you've
+                    gathered</span> so far, where
+                are the possible locations that Eliza Brown could've been infected from? List the locations in order.
+            </div>
+            <input type="text" id="password1a" placeholder="ENTER PASSWORD FOR PUZZLE 1 Part 2" />
+            <button onclick="checkPuzzle1Part1()">UNLOCK PUZZLE 1 Part 2</button>
+            <div class="error" id="error1a"></div>
+            <button class="secondary" onclick="showPage('storyPage')">BACK</button>
+        </div>
+    </section>
+
+    <section class="screen" id="puzzle1Part2Page">
+        <div class="terminal">
+            <h2>PUZZLE 1 TERMINAL - Part 2</h2>
+            <div class="subtitle">Host Range Matching</div>
+            <div class="panel">
+                <span class="label">Labratory Report</span>
+                The results from the veterinary lab came back! Based on the animal samples that were sent, they noticed
+                that there were some virus structures within the tissues. They sent you some of the animal cell images
+                with receptors and virus structure glycoproteins that were found in the samples. The veterinary lab
+                technicians left a note with the images for you to read:
+            </div>
+            <img src="handwriting1.png" alt="Hand write note" class="story-image">
+            <div class="panel">
+                <span class="label">Part 2 Instructions</span>
+                Match the shape of the glycoprotein to the receptor. <span class="highlight">Including the information
+                    you gathered from Part 1</span>,
+                where did Eliza Brown originally get infected? Answer the question using the <span
+                    class="highlight">animal in which the
+                    receptor was from</span>. (Hint: use the paired viral glycoprotein and cell receptor to confirm the
+                location of
+                infection on the map!)
+            </div>
+            <input type="text" id="password1b" placeholder="ENTER PASSWORD" />
+            <button onclick="checkPuzzle1Part2()">UNLOCK PUZZLE 2</button>
+            <div class="error" id="error1b"></div>
+
+            <button class="secondary" onclick="showPage('puzzle1Page')">BACK</button>
+        </div>
+    </section>
+
+    <section class="screen" id="puzzle2Part1Page">
+        <div class="terminal">
+            <h2>PUZZLE 2 TERMINAL - Part1</h2>
+            <div class="subtitle">Mutation & Viral Adaptation</div>
+            <div class="panel">
+                <span class="label">Background Story</span>
+                You have discovered that Eliza Brown has likely contracted a viral infection while handling chickens in
+                the East farm!
+                <br><br>
+                While looking at the viral glycoproteins and the cell receptors, you noticed something interesting with
+                the glycoproteins from the chicken and Eliza's lung cells… One glycoprotein fits with two receptors, but
+                the other only fits with one receptor…
+                <br><br>
+                Based on this finding, you head to the local clinic laboratory and run some RNA sequencing tests on the
+                viral structures from the chicken and Eliza. Unfortunately, the old-fashioned sequencer hasn't been
+                replaced for some time, so the sequences are messed up. Luckily, there is a cipher wheel attached to the
+                machine to allow the sequence to be 'translated' (how convenient…).
+            </div>
+            <div class="panel">
+                <span class="label">GENERATE SEQUENCING RESULTS</span>
+                <div class="sequence-block">
+                    Sequence 1 from chicken tissue:
+                    <span class="sequence">&gt;TMYAFBNUKCEWYWXOHMQTSVBCDWZELM</span>
+                    Sequence 2 from Eliza's tissue:
+                    <span class="sequence">&gt;BDKSWEILBRTDKNXVLQEBPJJJFDARUS</span>
+                </div>
+            </div>
+            <div class="panel">
+                <span class="label">Part 1a Instructions</span>
+                Use the cipher wheel to decode the messed-up sequence to generate the correct RNA sequence.
+                <img src="wheel.png" alt="Cipher wheel" class="story-image">
+            </div>
+            <div class="panel">
+                <span class="label">Part 1b Instructions</span>
+                After finding the correct RNA sequence, you need to convert the sequences to amino acids. These amino
+                acids will form the viral protein that was originally found in the chicken and Eliza's tissue samples
+                that were sent to the laboratory. Every three letters code for one amino acid. Using the conversion
+                table provided, find the amino acid sequence based on the RNA sequence you deciphered.
+                <br><br>
+                Once the amino acid sequence is found, identify any differences found between the sequences. Write the
+                amino acid from sequence 1, then from sequence 2.
+                <img src="match.png" alt="Match Sheet" class="story-image">
+            </div>
+            <input type="text" id="password2a" placeholder="ENTER Part1a PASSWORD" />
+            <input type="text" id="password2b" placeholder="ENTER Part1b PASSWORD" />
+            <button onclick="checkPuzzle2Part1()">UNLOCK PUZZLE 2 Part 2</button>
+            <div class="error" id="error2"></div>
+            <button class="secondary" onclick="showPage('puzzle1Part2Page')">BACK</button>
+        </div>
+    </section>
+
+    <section class="screen" id="puzzle2Part2Page">
+        <div class="terminal">
+            <h2>PUZZLE 2 TERMINAL - Part2</h2>
+            <div class="subtitle">Tracing Viral Evolution</div>
+            <div class="panel">
+                <span class="label">Cross-Species Spillover</span>
+                You found that the viral protein from Eliza's tissue sample only differs by one amino acid from the
+                chicken viral protein. What a small difference that led to the glycoprotein being able to bind to both
+                human and chicken lung receptors!
+                <br><br>
+                As an epidemiologist, you know that animal viruses can mutate and 'spillover' to humans, leading to an
+                outbreak. These outbreaks can occur in situations similar to what you are seeing now - somehow, the
+                chicken virus mutated a single change in its amino acid (which you identified), allowing the virus to
+                infect humans. Unfortunately, Eliza was the first victim to this spillover event.
+            </div>
+            <div class="panel">
+                <span class="label">Instructions</span>
+                Here are some steps that contribute to an animal virus developing the ability to infect humans. Arrange
+                the cards in the correct order. Use this number order as the password.
+            </div>
+            <input type="text" id="password2part2" placeholder="ENTER PASSWORD" />
+            <button onclick="checkPuzzle2Part2()">UNLOCK PUZZLE 3</button>
+            <div class="error" id="error2part2"></div>
+            <button class="secondary" onclick="showPage('puzzle2Part1Page')">BACK</button>
+        </div>
+    </section>
+
+    <section class="screen" id="puzzle3Page">
+        <div class="terminal">
+            <h1>PUZZLE 3 TERMINAL</h1>
+            <div class="panel">
+                <span class="label">Containing the Outbreak</span>
+                In the days following Eliza Brown's death, several villagers begin showing flu-like symptoms. The clinic
+                now suspects the virus may already be spreading through the village.
+                <br><br>
+                Unfortunately, the village pharmacy currently has <span class="highlight">only eight vaccine doses available</span>, and the next
+                shipment will not arrive for another week. If the virus continues to spread during this time, more
+                residents may become infected.
+                <br><br>
+                As the epidemiologist investigating the outbreak, <span class="highlight">you must decide</span> how to use these limited vaccines to
+                <span class="highlight">slow the spread of the virus and protect the community</span>.
+            </div>
+            <div class="panel">
+                <span class="label">Your Mission</span>
+                In the days following Eliza Brown's death, several villagers begin showing flu-like symptoms. The clinic
+                now suspects the virus may already be spreading through the village.
+                <br><br>
+                Unfortunately, the village pharmacy currently has only eight vaccine doses available, and the next
+                shipment will not arrive for another week. If the virus continues to spread during this time, more
+                residents may become infected.
+                <br><br>
+                As the epidemiologist investigating the outbreak, you must decide how to use these limited vaccines to
+                slow the spread of the virus and protect the community.
+            </div>
+
+            <div class="panel">
+                <span class="label">Instructions</span>
+                <ol>
+                    <li>Examine the Social Network Map
+                        <ul>
+                            <li>Study the map to understand how villagers interact with one another and who has the most
+                                daily contacts.</li>
+                        </ul>
+                    </li>
+                    <li>Review the Character Cards
+                        <ul>
+                            <li>Each villager has a character card with two sides:</li>
+                            <ul>
+                                <li>Front side: shows the character's social relationships and daily interactions with
+                                    others in the village.</li>
+                                <li>Back side: shows the character's health status, including whether they are healthy
+                                    and whether they are able to receive the vaccine.</li>
+                            </ul>
+                        </ul>
+                    </li>
+                    <li>Analyze the Information</li>
+                    <li>Use both the social network connections and the health status of each villager to determine who
+                        should be prioritized for vaccination.</li>
+                    <li>Select 8 Villagers to Vaccinate</li>
+                    <li>Choose eight villagers who you believe will best reduce the spread of the virus.</li>
+                    <li>Submit your decision by selecting the eight people you decided to vaccinate.</li>
+                    <li>Once your choices are submitted, the final outcome of the outbreak will be revealed.</li>
+                </ol>
+            </div>
+            <div class="panel">
+                <h2>Choose the people you want to vaccinate</h2>
+                <div id="selectionArea">
+                    <div id="slots"></div>
+                    <button onclick="startSimulation()" id="confirmBtn">CONFIRM VACCINATION</button>
+                </div>
+
+                <div class="error" id="selectionError"></div>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="screen" id="resultPage">
+        <div class="terminal">
+
+            <h1>Public Health Outcome</h1>
+
+            <div id="resultTerminal"></div>
+
+            <button class="secondary" onclick="showPage('puzzle3Page')">
+                BACK
+            </button>
+
+        </div>
+    </section>
 
     <script>
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.screen');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function checkPuzzle1Part1() {
+            const input = document.getElementById('password1a').value.trim().toLowerCase();
+            const error = document.getElementById('error1a');
+            const correctPassword = '1236';
+
+            if (input === correctPassword) {
+                error.textContent = '';
+                showPage('puzzle1Part2Page');
+            } else {
+                error.textContent = 'INCORRECT PASSWORD. TRY AGAIN.';
+            }
+        }
+
+        function checkPuzzle1Part2() {
+            const input = document.getElementById('password1b').value.trim().toLowerCase();
+            const error = document.getElementById('error1b');
+            const correctPassword = 'chicken';
+
+            if (input === correctPassword) {
+                error.textContent = '';
+                showPage('puzzle2Part1Page');
+            } else {
+                error.textContent = 'INCORRECT PASSWORD. TRY AGAIN.';
+            }
+        }
+
+        function checkPuzzle2Part1() {
+            const input1 = document.getElementById('password2a').value.trim().toLowerCase();
+            const input2 = document.getElementById('password2b').value.trim().toLowerCase();
+            const error = document.getElementById('error2');
+            const correctPassword1 = 'gly';
+            const correctPassword2 = 'asp';
+
+            if (input1 === correctPassword1 && input2 === correctPassword2) {
+                error.textContent = '';
+                showPage('puzzle2Part2Page');
+            } else {
+                error.textContent = 'ONE OR BOTH PASSWORDS ARE INCORRECT.';
+            }
+        }
+
+        function checkPuzzle2Part2() {
+            const input = document.getElementById('password2part2').value.trim().toLowerCase();
+            const error = document.getElementById('error2part2');
+            const correctPassword = '145362';
+
+            if (input === correctPassword) {
+                error.textContent = '';
+                showPage('puzzle3Page');
+            } else {
+                error.textContent = 'INCORRECT PASSWORD. TRY AGAIN.';
+            }
+        }
 
         const people = [
-
-            "Mr.Brown", "Mrs.Brown", "Brown Jr", "Mr.Foster", "Mrs.Foster",
-            "Mr.Owens", "Mrs.Owens", "Owens Jr", "William Harris", "Mr.Parker",
-            "Mrs.Parker", "Mrs.Quinn", "Mr.Smith", "Mrs.Smith", "Miss.Christine",
-            "Grandpapa Thompson", "Grandmama Thompson", "Mr.Copper", "Ms.Nelson", "Mr.King"
-
-        ]
+            'Mr.Brown', 'Mrs.Brown', 'Brown Jr', 'Mr.Foster', 'Mrs.Foster',
+            'Mr.Owens', 'Mrs.Owens', 'Owens Jr', 'William Quinn', 'Mr.Parker',
+            'Mrs.Parker', 'Mrs.Quinn', 'Mr.Smith', 'Mrs.Smith', 'Miss.Christine',
+            'Grandpapa Thompson', 'Grandmama Thompson', 'Mr.Copper', 'Mr.Nelson', 'Mr.King'
+        ];
 
         const required = [
-            "Brown Jr", "Mr.Parker", "Mrs.Quinn", "Mr.Owens", "Mr.Smith"
-        ]
+            'Brown Jr', 'Mr.Parker', 'Mrs.Quinn', 'Mr.Owens', 'Mr.Smith'
+        ];
 
         const allergy = [
-            "William Harris", "Mrs.Owens", "Mrs.Parker", "Mrs.Foster"
-        ]
+            'William Quinn', 'Mrs.Owens', 'Mrs.Parker', 'Mrs.Foster'
+        ];
 
-
-        // 创建选择框
         for (let i = 0; i < 8; i++) {
+            let div = document.createElement('div');
+            div.className = 'slot';
 
-            let div = document.createElement("div")
-            div.className = "slot"
+            let select = document.createElement('select');
+            select.id = 'slot' + i;
+            select.onchange = updateOptions;
 
-            let select = document.createElement("select")
-            select.id = "slot" + i
-            select.onchange = updateOptions
-
-            select.add(new Option("Select person " + (i + 1), ""))
+            select.add(new Option('Select person ' + (i + 1), ''));
 
             people.forEach(p => {
-                select.add(new Option(p, p))
-            })
+                select.add(new Option(p, p));
+            });
 
-            div.appendChild(select)
-            document.getElementById("slots").appendChild(div)
-
+            div.appendChild(select);
+            document.getElementById('slots').appendChild(div);
         }
 
-
-        // 防止重复选择
         function updateOptions() {
-
-            let selected = []
+            let selected = [];
 
             for (let i = 0; i < 8; i++) {
-
-                let v = document.getElementById("slot" + i).value
-                if (v != "") selected.push(v)
-
+                let v = document.getElementById('slot' + i).value;
+                if (v !== '') selected.push(v);
             }
 
             for (let i = 0; i < 8; i++) {
-
-                let select = document.getElementById("slot" + i)
-                let current = select.value
+                let select = document.getElementById('slot' + i);
+                let current = select.value;
 
                 for (let opt of select.options) {
-
-                    if (opt.value == "") continue
-
-                    opt.disabled = selected.includes(opt.value)
-                        && opt.value != current
-
+                    if (opt.value === '') continue;
+                    opt.disabled = selected.includes(opt.value) && opt.value !== current;
                 }
-
             }
-
         }
 
-
-        // 开始模拟
         function startSimulation() {
 
-            let chosen = []
+            let chosen = [];
+            let errorBox = document.getElementById("selectionError");
+            errorBox.textContent = "";
 
             for (let i = 0; i < 8; i++) {
 
-                let v = document.getElementById("slot" + i).value
+                let v = document.getElementById("slot" + i).value;
 
-                if (v == "") {
-                    alert("Select 8 individuals")
-                    return
+                if (v === "") {
+                    errorBox.textContent = "ERROR: You must select 8 villagers before continuing.";
+                    return;
                 }
 
-                chosen.push(v)
-
+                chosen.push(v);
             }
 
+            showPage("resultPage");
 
-            // 隐藏选择区域
-            let area = document.getElementById("selectionArea")
+            let terminal = document.getElementById("resultTerminal");
+            terminal.innerHTML = "";
 
-            area.classList.add("fadeOut")
-
-            setTimeout(() => {
-                area.style.display = "none"
-            }, 800)
-
-
-            document.body.classList.add("flash")
-
-            let ending = document.getElementById("ending")
-
-            ending.style.display = "block"
-
-            ending.innerHTML = ""
-
-            typeLine("Injecting vaccines...")
-            setTimeout(() => typeLine("Analyzing transmission network..."), 1200)
-            setTimeout(() => typeLine("Simulating outbreak..."), 2400)
-            setTimeout(() => showResult(chosen), 4000)
-
+            typeLine("Processing your decision...");
+            setTimeout(() => typeLine("Injecting vaccines..."), 1200);
+            setTimeout(() => typeLine("Calculating Result..."), 2400);
+            setTimeout(() => showResult(chosen), 4000);
         }
 
-
-        // 打字效果
         function typeLine(text) {
 
-            let div = document.createElement("div")
+            let terminal = document.getElementById("resultTerminal");
 
-            document.getElementById("ending").appendChild(div)
+            let div = document.createElement("div");
+            terminal.appendChild(div);
 
-            let i = 0
+            let i = 0;
 
             let interval = setInterval(() => {
 
-                div.innerHTML = text.substring(0, i)
+                div.innerHTML = text.substring(0, i);
+                i++;
 
-                i++
+                if (i > text.length) clearInterval(interval);
 
-                if (i > text.length) clearInterval(interval)
-
-            }, 30)
-
+            }, 30);
         }
-
 
         function showResult(chosen) {
 
-            let ending = document.getElementById("ending")
+            let ending = document.getElementById("resultTerminal");
+            let good = required.every(p => chosen.includes(p));
+            let deaths = chosen.filter(person => allergy.includes(person));
 
-            // 计算是否达成好结局
-            let good = required.every(p => chosen.includes(p))
-
-            let result = document.createElement("div")
+            let resultBlock = document.createElement("div");
+            resultBlock.className = "panel";
+            resultBlock.style.marginTop = "16px";
 
             if (good) {
 
-                result.className = "good"
-                result.innerHTML = "<br>HERD IMMUNITY ACHIEVED"
+                resultBlock.innerHTML = `
+        <span class="label">Happy Ending</span>
+
+        Your vaccination strategy successfully slows the spread of the virus. By vaccinating the villagers with the most social connections, you break several key transmission pathways in the community.
+        <br><br>
+        The virus fails to spread widely, and the outbreak is quickly contained. Over time, no additional villagers become infected.
+        <br><br>
+        When the next shipment of vaccines arrives a week later, the remaining residents are safely vaccinated. The village returns to normal life, and everyone survives the outbreak.
+        `;
+
+                ending.appendChild(resultBlock);
+
+                //  Check allergy at good ending
+                if (deaths.length > 0) {
+
+                    let allergyBlock = document.createElement("div");
+                    allergyBlock.className = "panel";
+                    allergyBlock.style.marginTop = "12px";
+
+                    allergyBlock.innerHTML = `
+            <span class="label">VACCINE REACTION</span>
+
+            <div style="color:#ff4d4d;">
+            Unfortunately, ${deaths.length} individual(s) experienced a fatal allergic reaction to the vaccine.
+            <br><br>
+            Fatalities: ${deaths.join(", ")}
+            </div>
+            `;
+
+                    ending.appendChild(allergyBlock);
+                }
 
             } else {
 
-                result.className = "bad"
-                result.innerHTML = "<br>PANDEMIC UNCONTROLLED"
+                resultBlock.innerHTML = `
+        <span class="label-bad">Bad Ending</span>
 
+        Unfortunately, the virus spreads rapidly through the village. Because too few key individuals were vaccinated, the infection moves quickly through the social network. Within days, more villagers begin to show severe symptoms.
+        <br><br>
+        The mutated virus proves highly contagious, and the outbreak soon affects nearly everyone in the community. The village struggles to contain the epidemic as hospitals become overwhelmed.
+        <br><br>
+        Despite your efforts, the virus continues to spread, and the village suffers heavy losses.
+        `;
+
+                ending.appendChild(resultBlock);
             }
-
-            ending.appendChild(result)
-
-
-            // 再计算过敏死亡（不会影响上面的显示）
-            let deaths = chosen.filter(person => allergy.includes(person))
-
-            if (deaths.length > 0) {
-
-                let warningTitle = document.createElement("div")
-                warningTitle.className = "bad"
-                warningTitle.style.marginTop = "20px"
-
-                warningTitle.innerHTML =
-                    "<br>VACCINE REACTION DETECTED<br>" +
-                    deaths.length + " INDIVIDUAL(S) DECEASED"
-
-                ending.appendChild(warningTitle)
-
-
-                let nameDiv = document.createElement("div")
-                nameDiv.className = "extra"
-                nameDiv.innerHTML = "Fatalities: " + deaths.join(", ")
-
-                ending.appendChild(nameDiv)
-
-            }
-
         }
-
     </script>
-
 </body>
 
 </html>
-
-
